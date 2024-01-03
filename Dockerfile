@@ -8,11 +8,9 @@ RUN dnf install --refresh -y unzip \
 ARG TARGETPLATFORM
 ARG VERSION
 
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCH='x86_64'; else ARCH='arm64'; fi;
-
 RUN curl -s -L -o '/tmp/airconnect.zip'  "https://github.com/philippe44/AirConnect/releases/download/${VERSION}/AirConnect-${VERSION}.zip"
 RUN unzip -q -d '/tmp/airconnect' '/tmp/airconnect.zip'
-RUN cp "/tmp/airconnect/aircast-linux-${ARCH}" '/usr/local/bin/aircast'
+RUN cp "/tmp/airconnect/aircast-linux-$( if [ ${TARGETPLATFORM} = 'linux/amd64' ]; then echo 'x86_64'; else echo 'arm64'; fi; )" '/usr/local/bin/aircast'
 RUN chmod +x '/usr/local/bin/aircast'
 RUN rm -rf '/tmp/airconnect*'
 
