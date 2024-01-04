@@ -54,8 +54,8 @@ jobs:
           VERSION=$(curl -s https://api.github.com/repos/philippe44/AirConnect/releases/latest | grep tag_name | cut -d '"' -f 4)
           echo version=${VERSION} >> $GITHUB_OUTPUT
 
-          curl -s -L -o 'airconnect.zip'  "https://github.com/philippe44/AirConnect/releases/download/${VERSION}/AirConnect-${VERSION}.zip"
-          unzip -q -d 'airconnect' 'airconnect.zip'
+          curl -L -o 'airconnect.zip'  "https://github.com/philippe44/AirConnect/releases/download/${VERSION}/AirConnect-${VERSION}.zip"
+          unzip -d 'airconnect' 'airconnect.zip'
 
       # Extract Docker metadata
       # This step is mostly used to simplify tag generation.
