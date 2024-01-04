@@ -47,12 +47,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Extract version metadata from the AirConnect repository.
-      - name: Extract version metadata
-        id: airconnect-version
+      # Download AirConnect from its repository.
+      - name: Download AirConnect
+        id: airconnect
         run: |
           VERSION=$(curl -s https://api.github.com/repos/philippe44/AirConnect/releases/latest | grep tag_name | cut -d '"' -f 4)
           echo version=${VERSION} >> $GITHUB_OUTPUT
+
+          curl -s -L -o 'airconnect.zip'  "https://github.com/philippe44/AirConnect/releases/download/${VERSION}/AirConnect-${VERSION}.zip"
+          unzip -q -d 'airconnect' 'airconnect.zip'
 
       # Extract Docker metadata
       # This step is mostly used to simplify tag generation.
@@ -66,7 +69,7 @@ jobs:
           flavor: |
             latest=true
           tags: |
-            type=raw,enable=true,value=${{ steps.airconnect-version.outputs.version }}
+            type=raw,enable=true,value=${{ steps.airconnect.outputs.version }}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -77,7 +80,7 @@ jobs:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           platforms: linux/amd64, linux/arm64
-          build-args: VERSION=${{ steps.airconnect-version.outputs.version }}
+          build-args: VERSION=${{ steps.airconnect.outputs.version }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha

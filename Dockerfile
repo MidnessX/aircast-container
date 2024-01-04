@@ -1,17 +1,16 @@
-FROM registry.access.redhat.com/ubi8/ubi:latest
+FROM registry.access.redhat.com/ubi8/ubi:latest as setup
 
-ENTRYPOINT [ "/usr/local/bin/aircast" ]
+ARG TARGETPLATFORM
 
 RUN dnf install --refresh -y unzip \
     && dnf clean all 
 
-ARG TARGETPLATFORM
-ARG VERSION
+COPY ./airconnect/aircast-linux-* /tmp/aircast-bin/
+RUN mv "/tmp/aircast-bin/aircast-linux-$( if [ ${TARGETPLATFORM} = 'linux/amd64' ]; then echo 'x86_64'; else echo 'aarch64'; fi; )" '/tmp/aircast'
+RUN chmod +x '/tmp/aircast*'
 
-RUN curl -s -L -o '/tmp/airconnect.zip'  "https://github.com/philippe44/AirConnect/releases/download/${VERSION}/AirConnect-${VERSION}.zip"
-RUN unzip -q -d '/tmp/airconnect' '/tmp/airconnect.zip'
-RUN cp "/tmp/airconnect/aircast-linux-$( if [ ${TARGETPLATFORM} = 'linux/amd64' ]; then echo 'x86_64'; else echo 'aarch64'; fi; )" '/usr/local/bin/aircast'
-RUN chmod +x '/usr/local/bin/aircast'
-RUN rm -rf '/tmp/airconnect*'
+FROM registry.access.redhat.com/ubi8/ubi:latest
 
+COPY --from=setup /tmp/aircast /usr/local/bin/
+ENTRYPOINT [ "/usr/local/bin/aircast" ]
 USER 1000
