@@ -4,6 +4,7 @@ ARG TARGETPLATFORM
 
 COPY ./airconnect/aircast-linux-* /tmp/aircast-bin/
 RUN mv "/tmp/aircast-bin/aircast-linux-$( if [ ${TARGETPLATFORM} = 'linux/amd64' ]; then echo 'x86_64'; else echo 'aarch64'; fi; )-static" '/tmp/aircast'
+RUN chmod +x '/tmp/aircast'
 
 FROM scratch
 
