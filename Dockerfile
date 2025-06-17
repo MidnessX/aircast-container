@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8-micro:latest as setup
+FROM registry.access.redhat.com/ubi8-micro:latest AS setup
 
 ARG TARGETPLATFORM
 
